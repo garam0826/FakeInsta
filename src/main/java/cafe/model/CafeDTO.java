@@ -1,33 +1,39 @@
 package cafe.model;
 
 public class CafeDTO {
+
     private String customer;
     private String drink;
-    private int waitingNumber;
+    private int watingNumber;
 
-    public void setCustomer(String customer){
-        this.customer=customer;
+    public void setCustomer(String custumer)
+    {
+        this.customer = custumer;
     }
-
-    public String getCustomer(){
+    public String getCustomer()
+    {
         return this.customer;
     }
 
-    public void setDrink(String drink){
-        this.drink=drink;
+    public void setDrink(String drik)
+    {
+        this.drink = drik;
     }
-
-    public String getDrink(){
+    public String getDrink()
+    {
         return this.drink;
     }
 
-    public void setWaitingNumber(int waitingNumber){
-        this.waitingNumber=waitingNumber;
+    public void setWatingNumber(int watingNumber)
+    {
+        this.watingNumber = watingNumber;
+    }
+    public int getWatingNumber()
+    {
+        return this.watingNumber;
     }
 
-    public int getWaitingNumber(){
-        return this.waitingNumber;
-    }
+
+
 }
-
 

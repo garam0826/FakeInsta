@@ -1,7 +1,8 @@
 package cafe.ctrl;
-import db.util.DBUtil;
-import cafe.model.CafeDTO;
 
+import cafe.dao.CafeDAO;
+import cafe.model.CafeDTO;
+import db.util.DBUtil;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -10,50 +11,56 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet(name = "cafectrl", value = "/catectrl")
+@WebServlet(name = "cafectrl", value = "/cafectrl")
 public class CafeCtrl extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
-
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //로직은 무조건 post, 보안이 더 좋기 떄문
-        DBUtil<CafeDTO> dbUtil = null;
-        System.out.println("Hello");
-        System.out.println("Hello");
 
-        PrintWriter out = response.getWriter();
-        try{
+
+        String strRunCode   =   request.getParameter("CODE");
+
+        switch (strRunCode)
+        {
+            case "S01": //커피조회
+                runS01(request, response);
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+    //
+    private void runS01(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        DBUtil<CafeDTO> dbUtil  =   null;
+
+        try
+        {
+            String strCoffee    = request.getParameter("drink");
             dbUtil = new DBUtil<CafeDTO>();
-
-            List<CafeDTO> cafeDTOList = dbUtil.select("select*from cafe",CafeDTO.class);
-            System.out.println("send==>"+cafeDTOList);
-
-            //보낸값
-            request.setAttribute("cafeList",cafeDTOList);
+            CafeDAO cafeDAO =   new CafeDAO();
+            List<CafeDTO> cafeDTOList = cafeDAO.read(dbUtil, "where drink='" + strCoffee + "'");
+            request.setAttribute("cafeList", cafeDTOList);
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("/cafe/selectCafe.jsp");
-            requestDispatcher.forward(request,response);
-            /*
-            for(CafeDTO cafeDTO: cafeDTOList){
-                out.print("customer"+ cafeDTO.getCustomer()+"<br>");
-                out.print("drink"+ cafeDTO.getDrink()+"<br>");
-                out.print("waitingNumber"+ cafeDTO.getWaitingNumber()+"<br>");
-
-            }
-            */
+            requestDispatcher.forward(request, response);
 
         }
-        catch(Exception ex){
+        catch (Exception ex)
+        {
             ex.printStackTrace();
         }
-        finally{
-            if(dbUtil !=null){
+        finally {
+            if(dbUtil != null)
+            {
                 dbUtil.Close();
             }
-
         }
 
 
