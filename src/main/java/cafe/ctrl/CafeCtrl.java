@@ -23,6 +23,7 @@ public class CafeCtrl extends HttpServlet {
         //로직은 무조건 post, 보안이 더 좋기 떄문
         DBUtil<CafeDTO> dbUtil = null;
         System.out.println("Hello");
+        System.out.println("Hello");
 
         PrintWriter out = response.getWriter();
         try{
