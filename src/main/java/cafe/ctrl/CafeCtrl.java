@@ -22,6 +22,7 @@ public class CafeCtrl extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //로직은 무조건 post, 보안이 더 좋기 떄문
         DBUtil<CafeDTO> dbUtil = null;
+        System.out.println("Hello");
 
         PrintWriter out = response.getWriter();
         try{
