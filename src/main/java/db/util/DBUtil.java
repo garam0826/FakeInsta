@@ -20,7 +20,7 @@ public class DBUtil <T>
 {
     private Connection conn = null;
     private Statement stmt	=	null;
-    private PreparedStatement pstmt	=	null;
+    private final PreparedStatement pstmt	=	null;
 
     public DBUtil ()
     {
@@ -129,26 +129,39 @@ public class DBUtil <T>
     }
 
 
+
+
+
     public List<T> select(String strQuery, Class<T> clazz)
     {
-        ResultSet rs	=	null;
-
-        List<T> selectList	=	new ArrayList<T>();
+        List<T> selectList	=	new ArrayList<>();
 
         try
         {
+            Constructor<T> constructor = clazz.getConstructor();
+            Method[] method =	clazz.getDeclaredMethods();
+            selectList =   getResultList(strQuery, constructor, method);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
+        return selectList;
+    }
+
+    private List<T> getResultList(String strQuery, Constructor<T> constructor, Method[] method)
+    {
+        ResultSet rs	=	null;
+
+        List<T> selectList	=	new ArrayList<>();
+
+        try
+        {
             rs = stmt.executeQuery(strQuery);
-			/*학교버전
-			while(rs.next())
-			{
-				String a	=	rs.getString("id");
-			}
-			*/
+
             ResultSetMetaData rsmd = rs.getMetaData();
 
-            Constructor<T> constructor = clazz.getConstructor();
-            Method method[]	=	clazz.getDeclaredMethods();
             while( rs.next() )
             {
                 T node = constructor.newInstance();
@@ -157,19 +170,16 @@ public class DBUtil <T>
                 {
                     String strColName	=	rsmd.getColumnName(j);
 
-                    for(int i=0; i<method.length; i++)
-                    {
-                        String strMethodName	=	method[i].getName().toLowerCase();
+                    for (Method value : method) {
+                        String strMethodName = value.getName().toLowerCase();
 
-                        if(strMethodName.startsWith("set"))
-                        {
-                            String strMethodColName	=	strMethodName.substring(3);
+                        if (strMethodName.startsWith("set")) {
+                            String strMethodColName = strMethodName.substring(3);
 
-                            if( strMethodColName.equalsIgnoreCase(strColName) )
-                            {
-                                Object	objValue	=	rs.getObject(j);
+                            if (strMethodColName.equalsIgnoreCase(strColName)) {
+                                Object objValue = rs.getObject(j);
                                 System.out.println(strMethodName);
-                                method[i].invoke(node, objValue);
+                                value.invoke(node, objValue);
                                 break;
                             }
                         }
@@ -182,7 +192,6 @@ public class DBUtil <T>
 
                 selectList.add(node);
             }
-
         }
         catch(Exception e)
         {
@@ -200,6 +209,68 @@ public class DBUtil <T>
                 }
             }
         }
+
+        return  selectList;
+    }
+
+
+
+
+
+    public List<T> select(T tClass)
+    {
+        StringBuffer strbufQuery   =   new StringBuffer();
+        List<T> selectList	=	new ArrayList<>();
+
+        try
+        {
+            Class clazz = tClass.getClass();
+            String strTableName =   clazz.getName();
+
+            strbufQuery.append("SELECT * FROM ");
+            strbufQuery.append(strTableName);
+            strbufQuery.append(" WHERE 1=1 ");
+
+            Method[] method =	clazz.getDeclaredMethods();
+
+            for (Method value : method) {
+                String strMethodName = value.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) value.invoke(tClass);
+                        if (strValue != null) {
+                            strbufQuery.append(String.format(" AND %s='%s'", strColNm, strValue));
+                        }
+
+                    } else {
+                        Object ObjValue = value.invoke(tClass);
+                        if (ObjValue != null) {
+                            strbufQuery.append(String.format(" AND %s=", strColNm));
+                            strbufQuery.append(ObjValue);
+                        }
+
+                    }
+                }
+            }
+
+
+
+
+            Constructor<T> constructor = clazz.getConstructor();
+
+            Method[] setMethod =	clazz.getDeclaredMethods();
+            selectList =   getResultList(strbufQuery.toString(), constructor, setMethod);
+
+
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
 
         return selectList;
     }

@@ -8,7 +8,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 @WebServlet(name = "cafectrl", value = "/cafectrl")
@@ -24,29 +23,27 @@ public class CafeCtrl extends HttpServlet {
 
         String strRunCode   =   request.getParameter("CODE");
 
-        switch (strRunCode)
-        {
-            case "S01": //커피조회
+        if (strRunCode.equals("S01")) { //커피조회
+            try {
                 runS01(request, response);
-                break;
-
-            default:
-                break;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
     }
 
     //
-    private void runS01(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    private void runS01(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
         DBUtil<CafeDTO> dbUtil  =   null;
 
         try
         {
             String strCoffee    = request.getParameter("drink");
-            dbUtil = new DBUtil<CafeDTO>();
+            dbUtil = new DBUtil<>();
             CafeDAO cafeDAO =   new CafeDAO();
-            List<CafeDTO> cafeDTOList = cafeDAO.read(dbUtil, "where drink='" + strCoffee + "'");
+             List<CafeDTO> cafeDTOList = cafeDAO.read(dbUtil, "where drink='" + strCoffee + "'");
             request.setAttribute("cafeList", cafeDTOList);
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("/cafe/selectCafe.jsp");
             requestDispatcher.forward(request, response);
