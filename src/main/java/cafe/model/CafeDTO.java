@@ -4,7 +4,7 @@ public class CafeDTO {
 
     private String customer;
     private String drink;
-    private int waitingNumber = -999999999;
+    private Integer waitingNumber;
 
     public void setCustomer(String custumer)
     {
@@ -28,7 +28,7 @@ public class CafeDTO {
     {
         this.waitingNumber = watingNumber;
     }
-    public int getWaitingNumber()
+    public Integer getWaitingNumber()
     {
         return this.waitingNumber;
     }

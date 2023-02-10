@@ -2,6 +2,7 @@ package db.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -181,41 +182,11 @@ public class DBUtil <T>
                     } else {
                         Object ObjValue = value.invoke(tClass);
                         if (ObjValue != null) {
-                            if (ObjValue instanceof Integer)
+                           // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
+                           // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
                             {
-                                int nValue  = (int)ObjValue;
-                                if (nValue != -999999999)
-                                {
-                                    strbufQuery.append(String.format(" AND %s=", strColNm));
-                                    strbufQuery.append(ObjValue);
-                                }
-                            }
-                            else if (ObjValue instanceof Long)
-                            {
-                                long nValue  = (long)ObjValue;
-                                if (nValue != -999999999)
-                                {
-                                    strbufQuery.append(String.format(" AND %s=", strColNm));
-                                    strbufQuery.append(ObjValue);
-                                }
-                            }
-                            else if (ObjValue instanceof Float)
-                            {
-                                float nValue  = (float)ObjValue;
-                                if (nValue != -999999999)
-                                {
-                                    strbufQuery.append(String.format(" AND %s=", strColNm));
-                                    strbufQuery.append(ObjValue);
-                                }
-                            }
-                            else if (ObjValue instanceof Double)
-                            {
-                                double nValue  = (double)ObjValue;
-                                if (nValue != -999999999)
-                                {
-                                    strbufQuery.append(String.format(" AND %s=", strColNm));
-                                    strbufQuery.append(ObjValue);
-                                }
+                                strbufQuery.append(String.format(" AND %s=", strColNm));
+                                strbufQuery.append(ObjValue);
                             }
                         }
                     }
