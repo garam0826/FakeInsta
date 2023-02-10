@@ -42,12 +42,21 @@ public class CafeCtrl extends HttpServlet {
         {
             String strCoffee    = request.getParameter("drink");
             dbUtil = new DBUtil<>();
+
+            CafeDTO dtd =   new CafeDTO();
+            dtd.setDrink(strCoffee);
+            List<CafeDTO> cafeDTOList = dbUtil.select(dtd);
+
+            /*
             CafeDAO cafeDAO =   new CafeDAO();
-             List<CafeDTO> cafeDTOList = cafeDAO.read(dbUtil, "where drink='" + strCoffee + "'");
+            List<CafeDTO> cafeDTOList = cafeDAO.read(dbUtil, "where drink='" + strCoffee + "'");
             request.setAttribute("cafeList", cafeDTOList);
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("/cafe/selectCafe.jsp");
             requestDispatcher.forward(request, response);
-
+            */
+            request.setAttribute("cafeList", cafeDTOList);
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/cafe/selectCafe.jsp");
+            requestDispatcher.forward(request, response);
         }
         catch (Exception ex)
         {

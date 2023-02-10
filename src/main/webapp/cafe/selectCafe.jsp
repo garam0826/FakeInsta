@@ -31,7 +31,7 @@
                 <tr>
                     <td><%=cafeDTO.getCustomer() %></td>
                     <td><%=cafeDTO.getDrink() %></td>
-                    <td><%=cafeDTO.getWatingNumber() %></td>
+                    <td><%=cafeDTO.getWaitingNumber() %></td>
                 </tr>
                 <% } %>
 

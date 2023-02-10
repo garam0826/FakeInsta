@@ -4,7 +4,7 @@ public class CafeDTO {
 
     private String customer;
     private String drink;
-    private int watingNumber;
+    private int waitingNumber = -999999999;
 
     public void setCustomer(String custumer)
     {
@@ -24,13 +24,13 @@ public class CafeDTO {
         return this.drink;
     }
 
-    public void setWatingNumber(int watingNumber)
+    public void setWaitingNumber(int watingNumber)
     {
-        this.watingNumber = watingNumber;
+        this.waitingNumber = watingNumber;
     }
-    public int getWatingNumber()
+    public int getWaitingNumber()
     {
-        return this.watingNumber;
+        return this.waitingNumber;
     }
 
 

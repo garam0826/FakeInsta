@@ -150,6 +150,95 @@ public class DBUtil <T>
         return selectList;
     }
 
+    public List<T> select(T tClass)
+    {
+        StringBuffer strbufQuery   =   new StringBuffer();
+        List<T> selectList	=	new ArrayList<>();
+
+        try
+        {
+            Class clazz           =     tClass.getClass();
+            String strClassName   =     clazz.getName();
+            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
+            strTableName = strTableName.substring(0, strTableName.length() -3);
+            strbufQuery.append("SELECT * FROM ");
+            strbufQuery.append(strTableName);
+            strbufQuery.append(" WHERE 1=1 ");
+
+            Method[] method =	clazz.getDeclaredMethods();
+
+            for (Method value : method) {
+                String strMethodName = value.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) value.invoke(tClass);
+                        if (strValue != null) {
+                            strbufQuery.append(String.format(" AND %s='%s'", strColNm, strValue));
+                        }
+
+                    } else {
+                        Object ObjValue = value.invoke(tClass);
+                        if (ObjValue != null) {
+                            if (ObjValue instanceof Integer)
+                            {
+                                int nValue  = (int)ObjValue;
+                                if (nValue != -999999999)
+                                {
+                                    strbufQuery.append(String.format(" AND %s=", strColNm));
+                                    strbufQuery.append(ObjValue);
+                                }
+                            }
+                            else if (ObjValue instanceof Long)
+                            {
+                                long nValue  = (long)ObjValue;
+                                if (nValue != -999999999)
+                                {
+                                    strbufQuery.append(String.format(" AND %s=", strColNm));
+                                    strbufQuery.append(ObjValue);
+                                }
+                            }
+                            else if (ObjValue instanceof Float)
+                            {
+                                float nValue  = (float)ObjValue;
+                                if (nValue != -999999999)
+                                {
+                                    strbufQuery.append(String.format(" AND %s=", strColNm));
+                                    strbufQuery.append(ObjValue);
+                                }
+                            }
+                            else if (ObjValue instanceof Double)
+                            {
+                                double nValue  = (double)ObjValue;
+                                if (nValue != -999999999)
+                                {
+                                    strbufQuery.append(String.format(" AND %s=", strColNm));
+                                    strbufQuery.append(ObjValue);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Constructor<T> constructor = clazz.getConstructor();
+
+            Method[] setMethod =	clazz.getDeclaredMethods();
+            selectList =   getResultList(strbufQuery.toString(), constructor, setMethod);
+
+
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        return selectList;
+    }
+
     private List<T> getResultList(String strQuery, Constructor<T> constructor, Method[] method)
     {
         ResultSet rs	=	null;
@@ -217,63 +306,7 @@ public class DBUtil <T>
 
 
 
-    public List<T> select(T tClass)
-    {
-        StringBuffer strbufQuery   =   new StringBuffer();
-        List<T> selectList	=	new ArrayList<>();
 
-        try
-        {
-            Class clazz = tClass.getClass();
-            String strTableName =   clazz.getName();
-
-            strbufQuery.append("SELECT * FROM ");
-            strbufQuery.append(strTableName);
-            strbufQuery.append(" WHERE 1=1 ");
-
-            Method[] method =	clazz.getDeclaredMethods();
-
-            for (Method value : method) {
-                String strMethodName = value.getName().toLowerCase();
-                if (strMethodName.startsWith("get")) {
-                    String strColNm = strMethodName.substring(3);
-
-                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
-                        String strValue = (String) value.invoke(tClass);
-                        if (strValue != null) {
-                            strbufQuery.append(String.format(" AND %s='%s'", strColNm, strValue));
-                        }
-
-                    } else {
-                        Object ObjValue = value.invoke(tClass);
-                        if (ObjValue != null) {
-                            strbufQuery.append(String.format(" AND %s=", strColNm));
-                            strbufQuery.append(ObjValue);
-                        }
-
-                    }
-                }
-            }
-
-
-
-
-            Constructor<T> constructor = clazz.getConstructor();
-
-            Method[] setMethod =	clazz.getDeclaredMethods();
-            selectList =   getResultList(strbufQuery.toString(), constructor, setMethod);
-
-
-
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
-
-        return selectList;
-    }
 
     public String selectToJson(String strQuery, Class<T> clazz)
     {
