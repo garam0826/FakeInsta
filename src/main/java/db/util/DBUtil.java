@@ -151,9 +151,268 @@ public class DBUtil <T>
         return selectList;
     }
 
+
+    public int insert(T tClass)
+    {
+        StringBuilder strbufQuery   =   new StringBuilder();
+        List<T> selectList	=	new ArrayList<>();
+
+        int nResulRow   =   -1;
+
+        try
+        {
+            Class clazz           =     tClass.getClass();
+            String strClassName   =     clazz.getName();
+            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
+            strTableName = strTableName.substring(0, strTableName.length() -3);
+            strbufQuery.append("INSERT INTO ");
+            strbufQuery.append(strTableName);
+            strbufQuery.append("(%s) VALUES (%s)");
+
+            StringBuilder strbufColumn   =   new StringBuilder();
+            StringBuilder strbufValue   =   new StringBuilder();
+
+            Method[] method =	clazz.getDeclaredMethods();
+
+            for (Method value : method) {
+                String strMethodName = value.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+                    if (strbufColumn.isEmpty())
+                    {
+                        strbufColumn.append(strColNm);
+                    }
+                    else
+                    {
+                        strbufColumn.append(", ");
+                        strbufColumn.append(strColNm);
+                    }
+
+                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) value.invoke(tClass);
+                        if (strValue != null) {
+                            if (strbufValue.isEmpty())
+                            {
+                                strbufValue.append("'");
+                                strbufValue.append(strValue);
+                                strbufValue.append("'");
+                            }
+                            else
+                            {
+                                strbufValue.append(", ");
+                                strbufValue.append("'");
+                                strbufValue.append(strValue);
+                                strbufValue.append("'");
+                            }
+                        }
+                        else
+                        {
+                            if (strbufValue.isEmpty())
+                            {
+                                strbufValue.append("null");
+                            }
+                            else
+                            {
+                                strbufValue.append(", null");
+                            }
+                        }
+
+                    } else {
+                        Object ObjValue = value.invoke(tClass);
+                        if (ObjValue != null) {
+
+                            if (strbufValue.isEmpty())
+                            {
+                                strbufValue.append(ObjValue);
+                            }
+                            else
+                            {
+                                strbufValue.append(", ");
+                                strbufValue.append(ObjValue);
+                            }
+
+                        }
+                        else
+                        {
+                            if (strbufValue.isEmpty())
+                            {
+                                strbufValue.append("null");
+                            }
+                            else
+                            {
+                                strbufValue.append(", null");
+                            }
+                        }
+                    }
+                }
+            }
+
+            String strInsert    =  String.format(strbufQuery.toString(), strbufColumn, strbufValue);
+            nResulRow =   insert( strInsert );
+
+
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        return nResulRow;
+    }
+
+    public int update(T updateClass, T whereClass)
+    {
+        StringBuilder strbufQuery    =   new StringBuilder();
+        StringBuilder strbufUpdate   =   new StringBuilder();
+        StringBuilder strbufWhere    =   new StringBuilder();
+        List<T> selectList	=	new ArrayList<>();
+
+        int nResulRow   =   -1;
+
+        try
+        {
+            Class clazz           =     whereClass.getClass();
+            String strClassName   =     clazz.getName();
+            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
+            strTableName = strTableName.substring(0, strTableName.length() -3);
+            strbufQuery.append("UPDATE ");
+            strbufQuery.append(strTableName);
+            strbufQuery.append(" SET %s WHERE %s ");
+
+            Method[] method =	clazz.getDeclaredMethods();
+
+            for (Method value : method) {
+                String strMethodName = value.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) value.invoke(whereClass);
+                        if (strValue != null) {
+                            strbufWhere.append(String.format(" AND %s='%s'", strColNm, strValue));
+                        }
+
+                    } else {
+                        Object ObjValue = value.invoke(whereClass);
+                        if (ObjValue != null) {
+                            // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
+                            // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
+                            {
+                                strbufWhere.append(String.format(" AND %s=", strColNm));
+                                strbufWhere.append(ObjValue);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            Class updateClazz           =     whereClass.getClass();
+            Method[] method2 =	updateClazz.getDeclaredMethods();
+
+            for (Method value : method2) {
+                String strMethodName = value.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) value.invoke(whereClass);
+                        if (strValue != null) {
+                            if (strbufUpdate.isEmpty() )
+                            {
+                                strbufUpdate.append(", ");
+                            }
+                            strbufUpdate.append(String.format(" %s='%s'", strColNm, strValue));
+                        }
+
+                    } else {
+                        Object ObjValue = value.invoke(whereClass);
+                        if (ObjValue != null) {
+                            if (strbufUpdate.isEmpty() )
+                            {
+                                strbufUpdate.append(", ");
+                            }
+
+                            strbufWhere.append(String.format(" %s=", strColNm));
+                            strbufWhere.append(ObjValue);
+
+                        }
+                    }
+                }
+            }
+
+            String strUpdate = String.format(strbufQuery.toString(), strbufUpdate, strbufWhere);
+            nResulRow =   update( strUpdate );
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        return nResulRow;
+    }
+
+    public int delete(T tClass)
+    {
+        StringBuilder strbufQuery   =   new StringBuilder();
+        List<T> selectList	=	new ArrayList<>();
+
+        int nResulRow   =   -1;
+
+        try
+        {
+            Class clazz           =     tClass.getClass();
+            String strClassName   =     clazz.getName();
+            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
+            strTableName = strTableName.substring(0, strTableName.length() -3);
+            strbufQuery.append("DELETE FROM ");
+            strbufQuery.append(strTableName);
+            strbufQuery.append(" WHERE 1=1 ");
+
+            Method[] method =	clazz.getDeclaredMethods();
+
+            for (Method value : method) {
+                String strMethodName = value.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) value.invoke(tClass);
+                        if (strValue != null) {
+                            strbufQuery.append(String.format(" AND %s='%s'", strColNm, strValue));
+                        }
+
+                    } else {
+                        Object ObjValue = value.invoke(tClass);
+                        if (ObjValue != null) {
+                            // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
+                            // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
+                            {
+                                strbufQuery.append(String.format(" AND %s=", strColNm));
+                                strbufQuery.append(ObjValue);
+                            }
+                        }
+                    }
+                }
+            }
+
+            nResulRow =   delete(strbufQuery.toString());
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        return nResulRow;
+    }
+
     public List<T> select(T tClass)
     {
-        StringBuffer strbufQuery   =   new StringBuffer();
+        StringBuilder strbufQuery   =   new StringBuilder();
         List<T> selectList	=	new ArrayList<>();
 
         try
