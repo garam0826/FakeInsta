@@ -182,8 +182,8 @@ public class DBUtil <T>
                     } else {
                         Object ObjValue = value.invoke(tClass);
                         if (ObjValue != null) {
-                           // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
-                           // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
+                            // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
+                            // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
                             {
                                 strbufQuery.append(String.format(" AND %s=", strColNm));
                                 strbufQuery.append(ObjValue);
