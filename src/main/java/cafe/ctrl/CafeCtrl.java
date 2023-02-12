@@ -71,4 +71,64 @@ public class CafeCtrl extends HttpServlet {
 
 
     }
+
+    private void runS02(HttpServletRequest request, HttpServletResponse response) throws Exception
+    {
+        DBUtil<CafeDTO> dbUtil  =   null;
+        boolean bIsSuccess = true;
+        try
+        {
+            String drink    = request.getParameter("drink");
+            String customer = request.getParameter("customer");
+
+            dbUtil = new DBUtil<>();
+
+
+            //UPDATE cafe SET customer  = '김이번' WHERE drink = 'coffee';
+
+            CafeDAO cafeDAO =   new CafeDAO();
+            int updateRowCnt = cafeDAO.updateNamewhereDrink(dbUtil, drink, customer);
+
+            if (updateRowCnt == 1)
+            {
+                //성공
+            }
+            else {
+                bIsSuccess = false;
+            }
+
+
+
+            /*
+            CafeDAO cafeDAO =   new CafeDAO();
+            List<CafeDTO> cafeDTOList = cafeDAO.read(dbUtil, "where drink='" + strCoffee + "'");
+            request.setAttribute("cafeList", cafeDTOList);
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/cafe/selectCafe.jsp");
+            requestDispatcher.forward(request, response);
+            */
+            //request.setAttribute("cafeList", cafeDTOList);
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/cafe/selectCafe.jsp");
+            requestDispatcher.forward(request, response);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            dbUtil.Rollback();
+        }
+        finally {
+            if (bIsSuccess)
+            {
+                dbUtil.Commit();
+            }
+            else {
+                dbUtil.Rollback();
+            }
+            if(dbUtil != null)
+            {
+                dbUtil.Close();
+            }
+        }
+
+
+    }
 }

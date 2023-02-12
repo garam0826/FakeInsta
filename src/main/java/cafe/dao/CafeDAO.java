@@ -3,6 +3,7 @@ package cafe.dao;
 import cafe.model.CafeDTO;
 import db.util.DBUtil;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class CafeDAO
@@ -13,9 +14,9 @@ public class CafeDAO
         return 0;
     }
 
-    public int update(DBUtil dbUtil)
-    {
-        return 0;
+    public int updateNamewhereDrink(DBUtil dbUtil, String drink, String customer) throws SQLException {
+        String updateQuery  = "UPDATE cafe SET customer  = '"+customer+"' WHERE drink = '"+drink+"' ";
+        return dbUtil.update(updateQuery);
     }
 
     public List<CafeDTO> read(DBUtil dbUtil, String strWhere)
