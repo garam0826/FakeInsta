@@ -159,7 +159,7 @@ public class DBUtil <T>
 
     public int insert(T tClass)
     {
-        StringBuilder strbufQuery   =   new StringBuilder();
+        StringBuffer strbufQuery   =   new StringBuffer();
         List<T> selectList	=	new ArrayList<>();
 
         int nResulRow   =   -1;
@@ -174,8 +174,8 @@ public class DBUtil <T>
             strbufQuery.append(strTableName);
             strbufQuery.append("(%s) VALUES (%s)");
 
-            StringBuilder strbufColumn   =   new StringBuilder();
-            StringBuilder strbufValue   =   new StringBuilder();
+            StringBuffer strbufColumn   =   new StringBuffer();
+            StringBuffer strbufValue   =   new StringBuffer();
 
             Method[] method =	clazz.getDeclaredMethods();
 
@@ -269,9 +269,9 @@ public class DBUtil <T>
 
     public int update(T updateClass, T whereClass)
     {
-        StringBuilder strbufQuery    =   new StringBuilder();
-        StringBuilder strbufUpdate   =   new StringBuilder();
-        StringBuilder strbufWhere    =   new StringBuilder();
+        StringBuffer strbufQuery    =   new StringBuffer();
+        StringBuffer strbufUpdate   =   new StringBuffer();
+        StringBuffer strbufWhere    =   new StringBuffer();
         List<T> selectList	=	new ArrayList<>();
 
         int nResulRow   =   -1;
@@ -362,7 +362,7 @@ public class DBUtil <T>
 
     public int delete(T tClass)
     {
-        StringBuilder strbufQuery   =   new StringBuilder();
+        StringBuffer strbufQuery   =   new StringBuffer();
         List<T> selectList	=	new ArrayList<>();
 
         int nResulRow   =   -1;
@@ -417,7 +417,7 @@ public class DBUtil <T>
 
     public List<T> select(T tClass)
     {
-        StringBuilder strbufQuery   =   new StringBuilder();
+        StringBuffer strbufQuery   =   new StringBuffer();
         List<T> selectList	=	new ArrayList<>();
 
         try
