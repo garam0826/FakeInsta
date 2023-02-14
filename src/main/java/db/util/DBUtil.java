@@ -1,8 +1,8 @@
 package db.util;
 
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,10 +10,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.google.gson.Gson;
 
@@ -25,23 +22,29 @@ public class DBUtil <T>
 
     public DBUtil ()
     {
+        Properties properties = new Properties();
+
         try{
+            InputStream is = this.getClass().getResourceAsStream("/conf.properties");
+            properties.load(is);
+
+
             // 1. 드라이버 로딩
             // 드라이버 인터페이스를 구현한 클래스를 로딩
             // mysql, oracle 등 각 벤더사 마다 클래스 이름이 다르다.
             // mysql은 "com.mysql.jdbc.Driver"이며, 이는 외우는 것이 아니라 구글링하면 된다.
             // 참고로 이전에 연동했던 jar 파일을 보면 com.mysql.jdbc 패키지에 Driver 라는 클래스가 있다.
-            Class.forName("org.mariadb.jdbc.Driver");
+            Class.forName(properties.getProperty("driver"));
 
             // 2. 연결하기
             // 드라이버 매니저에게 Connection 객체를 달라고 요청한다.
             // Connection을 얻기 위해 필요한 url 역시, 벤더사마다 다르다.
             // mysql은 "jdbc:mysql://localhost/사용할db이름" 이다.
-            String url = "jdbc:mariadb://dev.appdign.com:3306/FAKE_INSTA";
+            String url = properties.getProperty("url");
 
             // @param  getConnection(url, userName, password);
             // @return Connection
-            conn = DriverManager.getConnection(url, "fake_usr", "FakeInsta1234");
+            conn = DriverManager.getConnection(url, properties.getProperty("user_id"), properties.getProperty("password"));
             stmt = conn.createStatement();
             System.out.println("Conection success!!");
 
@@ -51,6 +54,8 @@ public class DBUtil <T>
         }
         catch(SQLException e){
             System.out.println("Error: " + e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
