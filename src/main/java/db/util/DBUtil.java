@@ -160,7 +160,6 @@ public class DBUtil <T>
     public int insert(T tClass)
     {
         StringBuffer strbufQuery   =   new StringBuffer();
-        List<T> selectList	=	new ArrayList<>();
 
         int nResulRow   =   -1;
 
@@ -272,7 +271,6 @@ public class DBUtil <T>
         StringBuffer strbufQuery    =   new StringBuffer();
         StringBuffer strbufUpdate   =   new StringBuffer();
         StringBuffer strbufWhere    =   new StringBuffer();
-        List<T> selectList	=	new ArrayList<>();
 
         int nResulRow   =   -1;
 
@@ -286,26 +284,34 @@ public class DBUtil <T>
             strbufQuery.append(strTableName);
             strbufQuery.append(" SET %s WHERE %s ");
 
-            Method[] method =	clazz.getDeclaredMethods();
+            Method[] whereMethods =	clazz.getDeclaredMethods();
 
-            for (Method value : method) {
-                String strMethodName = value.getName().toLowerCase();
+            for (Method whereMethod : whereMethods) {
+                String strMethodName = whereMethod.getName().toLowerCase();
                 if (strMethodName.startsWith("get")) {
                     String strColNm = strMethodName.substring(3);
 
-                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
-                        String strValue = (String) value.invoke(whereClass);
+                    if (whereMethod.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) whereMethod.invoke(whereClass);
                         if (strValue != null) {
-                            strbufWhere.append(String.format(" AND %s='%s'", strColNm, strValue));
+                            if (!strbufWhere.isEmpty())
+                            {
+                                strbufWhere.append(" AND ");
+                            }
+                            strbufWhere.append(String.format(" %s='%s'", strColNm, strValue));
                         }
 
                     } else {
-                        Object ObjValue = value.invoke(whereClass);
+                        Object ObjValue = whereMethod.invoke(whereClass);
                         if (ObjValue != null) {
                             // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
                             // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
                             {
-                                strbufWhere.append(String.format(" AND %s=", strColNm));
+                                if (!strbufWhere.isEmpty())
+                                {
+                                    strbufWhere.append(" AND ");
+                                }
+                                strbufWhere.append(String.format(" %s=", strColNm));
                                 strbufWhere.append(ObjValue);
                             }
                         }
@@ -314,18 +320,18 @@ public class DBUtil <T>
             }
 
 
-            Class updateClazz           =     whereClass.getClass();
-            Method[] method2 =	updateClazz.getDeclaredMethods();
+            Class updateClazz           =     updateClass.getClass();
+            Method[] updateMethods =	updateClazz.getDeclaredMethods();
 
-            for (Method value : method2) {
-                String strMethodName = value.getName().toLowerCase();
+            for (Method updateMethod : updateMethods) {
+                String strMethodName = updateMethod.getName().toLowerCase();
                 if (strMethodName.startsWith("get")) {
                     String strColNm = strMethodName.substring(3);
 
-                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
-                        String strValue = (String) value.invoke(whereClass);
+                    if (updateMethod.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) updateMethod.invoke(updateClass);
                         if (strValue != null) {
-                            if (strbufUpdate.isEmpty() )
+                            if (!strbufUpdate.isEmpty() )
                             {
                                 strbufUpdate.append(", ");
                             }
@@ -333,15 +339,15 @@ public class DBUtil <T>
                         }
 
                     } else {
-                        Object ObjValue = value.invoke(whereClass);
+                        Object ObjValue = updateMethod.invoke(updateClass);
                         if (ObjValue != null) {
-                            if (strbufUpdate.isEmpty() )
+                            if (!strbufUpdate.isEmpty() )
                             {
                                 strbufUpdate.append(", ");
                             }
 
-                            strbufWhere.append(String.format(" %s=", strColNm));
-                            strbufWhere.append(ObjValue);
+                            strbufUpdate.append(String.format(" %s=", strColNm));
+                            strbufUpdate.append(ObjValue);
 
                         }
                     }
@@ -363,7 +369,6 @@ public class DBUtil <T>
     public int delete(T tClass)
     {
         StringBuffer strbufQuery   =   new StringBuffer();
-        List<T> selectList	=	new ArrayList<>();
 
         int nResulRow   =   -1;
 
