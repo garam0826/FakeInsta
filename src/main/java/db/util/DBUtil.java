@@ -18,7 +18,8 @@ public class DBUtil <T>
 {
     private Connection conn = null;
     private Statement stmt	=	null;
-    private final PreparedStatement pstmt	=	null;
+
+    private String m_strStatementType =   "normal";
 
     public DBUtil ()
     {
@@ -45,7 +46,16 @@ public class DBUtil <T>
             // @param  getConnection(url, userName, password);
             // @return Connection
             conn = DriverManager.getConnection(url, properties.getProperty("user_id"), properties.getProperty("password"));
-            stmt = conn.createStatement();
+
+            String strStatementType = properties.getProperty("statement_type");
+            this.m_strStatementType = strStatementType == null ? this.m_strStatementType : strStatementType;
+
+            if("normal".equalsIgnoreCase(this.m_strStatementType) )
+            {
+                stmt = conn.createStatement();
+            }
+
+
             System.out.println("Conection success!!");
 
         }
@@ -74,6 +84,35 @@ public class DBUtil <T>
 
     }
 
+    private int update( String strQuery, List<Object> valueList) throws SQLException
+    {
+        int nResult	=	-1;
+        PreparedStatement pstmt = null;
+        conn.setAutoCommit(false);
+        try
+        {
+            pstmt =   conn.prepareStatement(strQuery);
+            int i = 1;
+            for (Object value : valueList)
+            {
+                pstmt.setObject(i, value);
+                i++;
+            }
+
+            nResult = pstmt.executeUpdate();
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        finally {
+            if(pstmt!= null) pstmt.close();
+        }
+
+        return nResult;
+
+    }
+
     public int insert( String strQuery ) throws SQLException
     {
         return update(strQuery);
@@ -92,6 +131,10 @@ public class DBUtil <T>
 
         try
         {
+            if(stmt == null )
+            {
+                stmt = this.conn.createStatement();
+            }
 
             rs = stmt.executeQuery(strQuery);
 			/*학교버전
@@ -135,9 +178,6 @@ public class DBUtil <T>
     }
 
 
-
-
-
     public List<T> select(String strQuery, Class<T> clazz)
     {
         List<T> selectList	=	new ArrayList<>();
@@ -146,7 +186,7 @@ public class DBUtil <T>
         {
             Constructor<T> constructor = clazz.getConstructor();
             Method[] method =	clazz.getDeclaredMethods();
-            selectList =   getResultList(strQuery, constructor, method);
+            selectList =   getResultList(strQuery, constructor, method, null);
         }
         catch(Exception e)
         {
@@ -157,283 +197,23 @@ public class DBUtil <T>
     }
 
 
-    public int insert(T tClass)
-    {
-        StringBuffer strbufQuery   =   new StringBuffer();
-
-        int nResulRow   =   -1;
-
-        try
-        {
-            Class clazz           =     tClass.getClass();
-            String strClassName   =     clazz.getName();
-            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
-            strTableName = strTableName.substring(0, strTableName.length() -3);
-            strbufQuery.append("INSERT INTO ");
-            strbufQuery.append(strTableName);
-            strbufQuery.append("(%s) VALUES (%s)");
-
-            StringBuffer strbufColumn   =   new StringBuffer();
-            StringBuffer strbufValue   =   new StringBuffer();
-
-            Method[] method =	clazz.getDeclaredMethods();
-
-            for (Method value : method) {
-                String strMethodName = value.getName().toLowerCase();
-                if (strMethodName.startsWith("get")) {
-                    String strColNm = strMethodName.substring(3);
-                    if (strbufColumn.isEmpty())
-                    {
-                        strbufColumn.append(strColNm);
-                    }
-                    else
-                    {
-                        strbufColumn.append(", ");
-                        strbufColumn.append(strColNm);
-                    }
-
-                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
-                        String strValue = (String) value.invoke(tClass);
-                        if (strValue != null) {
-                            if (strbufValue.isEmpty())
-                            {
-                                strbufValue.append("'");
-                                strbufValue.append(strValue);
-                                strbufValue.append("'");
-                            }
-                            else
-                            {
-                                strbufValue.append(", ");
-                                strbufValue.append("'");
-                                strbufValue.append(strValue);
-                                strbufValue.append("'");
-                            }
-                        }
-                        else
-                        {
-                            if (strbufValue.isEmpty())
-                            {
-                                strbufValue.append("null");
-                            }
-                            else
-                            {
-                                strbufValue.append(", null");
-                            }
-                        }
-
-                    } else {
-                        Object ObjValue = value.invoke(tClass);
-                        if (ObjValue != null) {
-
-                            if (strbufValue.isEmpty())
-                            {
-                                strbufValue.append(ObjValue);
-                            }
-                            else
-                            {
-                                strbufValue.append(", ");
-                                strbufValue.append(ObjValue);
-                            }
-
-                        }
-                        else
-                        {
-                            if (strbufValue.isEmpty())
-                            {
-                                strbufValue.append("null");
-                            }
-                            else
-                            {
-                                strbufValue.append(", null");
-                            }
-                        }
-                    }
-                }
-            }
-
-            String strInsert    =  String.format(strbufQuery.toString(), strbufColumn, strbufValue);
-            nResulRow =   insert( strInsert );
-
-
-
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
-
-        return nResulRow;
-    }
-
-    public int update(T updateClass, T whereClass)
-    {
-        StringBuffer strbufQuery    =   new StringBuffer();
-        StringBuffer strbufUpdate   =   new StringBuffer();
-        StringBuffer strbufWhere    =   new StringBuffer();
-
-        int nResulRow   =   -1;
-
-        try
-        {
-            Class clazz           =     whereClass.getClass();
-            String strClassName   =     clazz.getName();
-            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
-            strTableName = strTableName.substring(0, strTableName.length() -3);
-            strbufQuery.append("UPDATE ");
-            strbufQuery.append(strTableName);
-            strbufQuery.append(" SET %s WHERE %s ");
-
-            Method[] whereMethods =	clazz.getDeclaredMethods();
-
-            for (Method whereMethod : whereMethods) {
-                String strMethodName = whereMethod.getName().toLowerCase();
-                if (strMethodName.startsWith("get")) {
-                    String strColNm = strMethodName.substring(3);
-
-                    if (whereMethod.getReturnType().getName().toLowerCase().contains("string")) {
-                        String strValue = (String) whereMethod.invoke(whereClass);
-                        if (strValue != null) {
-                            if (!strbufWhere.isEmpty())
-                            {
-                                strbufWhere.append(" AND ");
-                            }
-                            strbufWhere.append(String.format(" %s='%s'", strColNm, strValue));
-                        }
-
-                    } else {
-                        Object ObjValue = whereMethod.invoke(whereClass);
-                        if (ObjValue != null) {
-                            // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
-                            // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
-                            {
-                                if (!strbufWhere.isEmpty())
-                                {
-                                    strbufWhere.append(" AND ");
-                                }
-                                strbufWhere.append(String.format(" %s=", strColNm));
-                                strbufWhere.append(ObjValue);
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            Class updateClazz           =     updateClass.getClass();
-            Method[] updateMethods =	updateClazz.getDeclaredMethods();
-
-            for (Method updateMethod : updateMethods) {
-                String strMethodName = updateMethod.getName().toLowerCase();
-                if (strMethodName.startsWith("get")) {
-                    String strColNm = strMethodName.substring(3);
-
-                    if (updateMethod.getReturnType().getName().toLowerCase().contains("string")) {
-                        String strValue = (String) updateMethod.invoke(updateClass);
-                        if (strValue != null) {
-                            if (!strbufUpdate.isEmpty() )
-                            {
-                                strbufUpdate.append(", ");
-                            }
-                            strbufUpdate.append(String.format(" %s='%s'", strColNm, strValue));
-                        }
-
-                    } else {
-                        Object ObjValue = updateMethod.invoke(updateClass);
-                        if (ObjValue != null) {
-                            if (!strbufUpdate.isEmpty() )
-                            {
-                                strbufUpdate.append(", ");
-                            }
-
-                            strbufUpdate.append(String.format(" %s=", strColNm));
-                            strbufUpdate.append(ObjValue);
-
-                        }
-                    }
-                }
-            }
-
-            String strUpdate = String.format(strbufQuery.toString(), strbufUpdate, strbufWhere);
-            nResulRow =   update( strUpdate );
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
-
-        return nResulRow;
-    }
-
-    public int delete(T tClass)
-    {
-        StringBuffer strbufQuery   =   new StringBuffer();
-
-        int nResulRow   =   -1;
-
-        try
-        {
-            Class clazz           =     tClass.getClass();
-            String strClassName   =     clazz.getName();
-            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
-            strTableName = strTableName.substring(0, strTableName.length() -3);
-            strbufQuery.append("DELETE FROM ");
-            strbufQuery.append(strTableName);
-            strbufQuery.append(" WHERE 1=1 ");
-
-            Method[] method =	clazz.getDeclaredMethods();
-
-            for (Method value : method) {
-                String strMethodName = value.getName().toLowerCase();
-                if (strMethodName.startsWith("get")) {
-                    String strColNm = strMethodName.substring(3);
-
-                    if (value.getReturnType().getName().toLowerCase().contains("string")) {
-                        String strValue = (String) value.invoke(tClass);
-                        if (strValue != null) {
-                            strbufQuery.append(String.format(" AND %s='%s'", strColNm, strValue));
-                        }
-
-                    } else {
-                        Object ObjValue = value.invoke(tClass);
-                        if (ObjValue != null) {
-                            // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
-                            // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
-                            {
-                                strbufQuery.append(String.format(" AND %s=", strColNm));
-                                strbufQuery.append(ObjValue);
-                            }
-                        }
-                    }
-                }
-            }
-
-            nResulRow =   delete(strbufQuery.toString());
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
-
-        return nResulRow;
-    }
-
     public List<T> select(T tClass)
     {
         StringBuffer strbufQuery   =   new StringBuffer();
         List<T> selectList	=	new ArrayList<>();
+        List<Object> valueList  =   new ArrayList<>();
+
+        StringBuffer strbufWhere = new StringBuffer();
 
         try
         {
             Class clazz           =     tClass.getClass();
             String strClassName   =     clazz.getName();
             String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
-            strTableName = strTableName.substring(0, strTableName.length() -3);
+
             strbufQuery.append("SELECT * FROM ");
             strbufQuery.append(strTableName);
-            strbufQuery.append(" WHERE 1=1 ");
+            strbufQuery.append(" WHERE ");
 
             Method[] method =	clazz.getDeclaredMethods();
 
@@ -444,8 +224,22 @@ public class DBUtil <T>
 
                     if (value.getReturnType().getName().toLowerCase().contains("string")) {
                         String strValue = (String) value.invoke(tClass);
-                        if (strValue != null) {
-                            strbufQuery.append(String.format(" AND %s='%s'", strColNm, strValue));
+                        if (strValue != null)
+                        {
+                            if("normal".equalsIgnoreCase(this.m_strStatementType))
+                            {
+                                if(!strbufWhere.isEmpty())
+                                {
+                                    strbufWhere.append(" AND ");
+                                }
+                                strbufWhere.append(String.format(" %s='%s'", strColNm, strValue));
+                            }
+                            else
+                            {
+                                strbufWhere.append(String.format(" %s= ?", strColNm));
+                                valueList.add(strValue);
+                            }
+
                         }
 
                     } else {
@@ -454,8 +248,22 @@ public class DBUtil <T>
                             // BigDecimal bnValue  =   new BigDecimal( ObjValue.toString() );
                             // if( bnValue.compareTo( new BigDecimal("-999999999") ) != 0)
                             {
-                                strbufQuery.append(String.format(" AND %s=", strColNm));
-                                strbufQuery.append(ObjValue);
+                                if(!strbufWhere.isEmpty())
+                                {
+                                    strbufWhere.append(" AND ");
+                                }
+
+                                if("normal".equalsIgnoreCase(this.m_strStatementType))
+                                {
+                                    strbufWhere.append(String.format(" %s=", strColNm));
+                                    strbufWhere.append(ObjValue);
+                                }
+                                else
+                                {
+                                    strbufWhere.append(String.format(" %s= ?", strColNm));
+                                    valueList.add(ObjValue);
+                                }
+
                             }
                         }
                     }
@@ -463,9 +271,9 @@ public class DBUtil <T>
             }
 
             Constructor<T> constructor = clazz.getConstructor();
-
+            strbufQuery.append(strbufWhere);
             Method[] setMethod =	clazz.getDeclaredMethods();
-            selectList =   getResultList(strbufQuery.toString(), constructor, setMethod);
+            selectList =   getResultList(strbufQuery.toString(), constructor, setMethod, valueList);
 
 
 
@@ -479,15 +287,37 @@ public class DBUtil <T>
         return selectList;
     }
 
-    private List<T> getResultList(String strQuery, Constructor<T> constructor, Method[] method)
+    private List<T> getResultList(String strQuery, Constructor<T> constructor, Method[] method, List<Object> valueList)
     {
         ResultSet rs	=	null;
 
         List<T> selectList	=	new ArrayList<>();
-
+        PreparedStatement pstmt =   null;
         try
         {
-            rs = stmt.executeQuery(strQuery);
+            if ("normal".equalsIgnoreCase(this.m_strStatementType))
+            {
+                if (stmt == null)
+                {
+                    stmt = this.conn.createStatement();
+                }
+                rs = stmt.executeQuery(strQuery);
+            }
+            else {
+                pstmt = conn.prepareStatement(strQuery);
+                if(valueList != null)
+                {
+                    int i = 1;
+                    for (Object value : valueList)
+                    {
+                        pstmt.setObject(i, value);
+                        i++;
+                    }
+                }
+
+                rs = pstmt.executeQuery();
+            }
+
 
             ResultSetMetaData rsmd = rs.getMetaData();
 
@@ -528,14 +358,15 @@ public class DBUtil <T>
         }
         finally
         {
-            if(rs != null)
+            try
             {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    System.out.println(e);
-                }
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            }
+            catch (SQLException e)
+            {
+                // TODO Auto-generated catch block
+                System.out.println(e);
             }
         }
 
@@ -543,16 +374,402 @@ public class DBUtil <T>
     }
 
 
-
-
-
-
-
-    public String selectToJson(String strQuery, Class<T> clazz)
+    public int insert(T tClass)
     {
-        List<T> selectList = select(strQuery, clazz);
-        return new Gson().toJson(selectList);
+        StringBuffer strbufQuery   =   new StringBuffer();
+
+        int nResulRow   =   -1;
+
+        try
+        {
+            Class clazz           =     tClass.getClass();
+            String strClassName   =     clazz.getName();
+            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
+
+            strbufQuery.append("INSERT INTO ");
+            strbufQuery.append(strTableName);
+            strbufQuery.append("(%s) VALUES (%s)");
+
+            StringBuffer strbufColumn   =   new StringBuffer();
+            StringBuffer strbufValue   =   new StringBuffer();
+
+            List<Object> valueList      =   new ArrayList<>();
+
+            Method[] method =	clazz.getDeclaredMethods();
+
+            for (Method value : method) {
+                String strMethodName = value.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+
+                    if ("normal".equalsIgnoreCase(this.m_strStatementType))
+                    {
+                        if (value.getReturnType().getName().toLowerCase().contains("string")) {
+                            String strValue = (String) value.invoke(tClass);
+                            if (strValue != null) {
+                                if (strbufColumn.isEmpty())
+                                {
+                                    strbufColumn.append(strColNm);
+                                }
+                                else
+                                {
+                                    strbufColumn.append(", ");
+                                    strbufColumn.append(strColNm);
+                                }
+
+                                if (strbufValue.isEmpty())
+                                {
+                                    strbufValue.append("'");
+                                    strbufValue.append(strValue);
+                                    strbufValue.append("'");
+                                }
+                                else
+                                {
+                                    strbufValue.append(", ");
+                                    strbufValue.append("'");
+                                    strbufValue.append(strValue);
+                                    strbufValue.append("'");
+                                }
+                            }
+
+                        } else {
+                            Object ObjValue = value.invoke(tClass);
+                            if (ObjValue != null) {
+                                if (strbufColumn.isEmpty())
+                                {
+                                    strbufColumn.append(strColNm);
+                                }
+                                else
+                                {
+                                    strbufColumn.append(", ");
+                                    strbufColumn.append(strColNm);
+                                }
+                                if (strbufValue.isEmpty())
+                                {
+                                    strbufValue.append(ObjValue);
+                                }
+                                else
+                                {
+                                    strbufValue.append(", ");
+                                    strbufValue.append(ObjValue);
+                                }
+
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        String objValue = (String) value.invoke(tClass);
+
+                        if(objValue != null)
+                        {
+                            if (strbufColumn.isEmpty())
+                            {
+                                strbufColumn.append(strColNm);
+                            }
+                            else
+                            {
+                                strbufColumn.append(", ");
+                                strbufColumn.append(strColNm);
+                            }
+
+                            if (strbufValue.isEmpty())
+                            {
+                                strbufValue.append("?");
+                            }
+                            else
+                            {
+                                strbufValue.append(", ?");
+                            }
+                            valueList.add(objValue);
+                        }
+                    }
+
+                }
+            }
+
+            String strInsert    =  String.format(strbufQuery.toString(), strbufColumn, strbufValue);
+
+            if ("normal".equalsIgnoreCase(this.m_strStatementType))
+            {
+                nResulRow =   insert(strInsert);
+            }
+            else {
+                nResulRow =   update( strInsert, valueList );
+            }
+
+
+
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        return nResulRow;
     }
+
+    public int update(T updateClass, T whereClass)
+    {
+        StringBuffer strbufQuery    =   new StringBuffer();
+        StringBuffer strbufUpdate   =   new StringBuffer();
+        StringBuffer strbufWhere    =   new StringBuffer();
+
+        List<Object> valueList      =   new ArrayList<>();
+
+        int nResulRow   =   -1;
+
+        try
+        {
+            Class clazz           =     whereClass.getClass();
+            String strClassName   =     clazz.getName();
+            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
+
+            strbufQuery.append("UPDATE ");
+            strbufQuery.append(strTableName);
+            strbufQuery.append(" SET %s WHERE %s ");
+
+            Class updateClazz           =     updateClass.getClass();
+            Method[] updateMethods =	updateClazz.getDeclaredMethods();
+
+            for (Method updateMethod : updateMethods) {
+                String strMethodName = updateMethod.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+                    if (updateMethod.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) updateMethod.invoke(updateClass);
+                        if (strValue != null) {
+
+                            if ("normal".equalsIgnoreCase(this.m_strStatementType))
+                            {
+                                if (!strbufUpdate.isEmpty() )
+                                {
+                                    strbufUpdate.append(", ");
+                                }
+                                strbufUpdate.append(String.format(" %s='%s'", strColNm, strValue));
+                            }
+                            else {
+                                if (!strbufUpdate.isEmpty() )
+                                {
+                                    strbufUpdate.append(", ");
+                                }
+                                strbufUpdate.append(String.format(" %s=?", strColNm));
+
+                                valueList.add(strValue);
+                            }
+
+                        }
+
+                    } else {
+                        Object ObjValue = updateMethod.invoke(updateClass);
+                        if (ObjValue != null) {
+                            if ("normal".equalsIgnoreCase(this.m_strStatementType))
+                            {
+                                if (!strbufUpdate.isEmpty() )
+                                {
+                                    strbufUpdate.append(", ");
+                                }
+
+                                strbufUpdate.append(String.format(" %s=", strColNm));
+                                strbufUpdate.append(ObjValue);
+                            }
+                            else {
+                                if (!strbufUpdate.isEmpty() )
+                                {
+                                    strbufUpdate.append(", ");
+                                }
+                                strbufUpdate.append(String.format(" %s=?", strColNm));
+
+                                valueList.add(ObjValue);
+                            }
+
+
+                        }
+                    }
+                }
+            }
+
+            Method[] whereMethods =	clazz.getDeclaredMethods();
+
+            for (Method whereMethod : whereMethods) {
+                String strMethodName = whereMethod.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+                    if (whereMethod.getReturnType().getName().toLowerCase().contains("string")) {
+                        String strValue = (String) whereMethod.invoke(whereClass);
+                        if (strValue != null) {
+
+                            if ("normal".equalsIgnoreCase(this.m_strStatementType))
+                            {
+                                if (!strbufWhere.isEmpty())
+                                {
+                                    strbufWhere.append(" AND ");
+                                }
+                                strbufWhere.append(String.format(" %s='%s'", strColNm, strValue));
+                            }
+                            else
+                            {
+                                if (!strbufWhere.isEmpty())
+                                {
+                                    strbufWhere.append(" AND ");
+                                }
+                                strbufWhere.append(String.format(" %s=?", strColNm));
+                                valueList.add(strValue);
+                            }
+
+                        }
+
+                    } else {
+                        Object ObjValue = whereMethod.invoke(whereClass);
+                        if (ObjValue != null) {
+                            {
+                                if ("normal".equalsIgnoreCase(this.m_strStatementType))
+                                {
+                                    if (!strbufWhere.isEmpty())
+                                    {
+                                        strbufWhere.append(" AND ");
+                                    }
+                                    strbufWhere.append(String.format(" %s=", strColNm));
+                                    strbufWhere.append(ObjValue);
+                                }
+                                else
+                                {
+                                    if (!strbufWhere.isEmpty())
+                                    {
+                                        strbufWhere.append(" AND ");
+                                    }
+                                    strbufWhere.append(String.format(" %s=?", strColNm));
+                                    valueList.add(ObjValue);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            String strUpdate = String.format(strbufQuery.toString(), strbufUpdate, strbufWhere);
+            if ("normal".equalsIgnoreCase(this.m_strStatementType))
+            {
+                nResulRow =   update( strUpdate );
+            }
+            else
+            {
+                nResulRow =   update( strUpdate, valueList );
+            }
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        return nResulRow;
+    }
+
+    public int delete(T tClass)
+    {
+        StringBuffer strbufQuery   =   new StringBuffer();
+        StringBuffer strbufWhere   =   new StringBuffer();
+
+        List<Object> valueList      =   new ArrayList<>();
+
+        int nResulRow   =   -1;
+
+        try
+        {
+            Class clazz           =     tClass.getClass();
+            String strClassName   =     clazz.getName();
+            String strTableName   =     strClassName.substring( strClassName.lastIndexOf(".")+1 );
+            strbufQuery.append("DELETE FROM ");
+            strbufQuery.append(strTableName);
+            strbufQuery.append(" WHERE  ");
+
+            Method[] method =	clazz.getDeclaredMethods();
+
+            for (Method value : method) {
+                String strMethodName = value.getName().toLowerCase();
+                if (strMethodName.startsWith("get")) {
+                    String strColNm = strMethodName.substring(3);
+
+                    if ("normal".equalsIgnoreCase(this.m_strStatementType))
+                    {
+                        if (value.getReturnType().getName().toLowerCase().contains("string")) {
+                            String strValue = (String) value.invoke(tClass);
+                            if (strValue != null) {
+
+                                if(!strbufWhere.isEmpty())
+                                {
+                                    strbufWhere.append( " AND " );
+                                }
+                                strbufWhere.append(String.format(" %s='%s'", strColNm, strValue));
+                            }
+                        } else {
+                            Object ObjValue = value.invoke(tClass);
+                            if (ObjValue != null) {
+                                {
+                                    if(!strbufWhere.isEmpty())
+                                    {
+                                        strbufWhere.append( " AND " );
+                                    }
+
+                                    strbufWhere.append(String.format(" %s=", strColNm));
+                                    strbufWhere.append(ObjValue);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Object ObjValue = value.invoke(tClass);
+                        if (ObjValue != null) {
+                            {
+                                if(!strbufWhere.isEmpty())
+                                {
+                                    strbufWhere.append( " AND " );
+                                }
+
+                                strbufWhere.append(String.format(" %s=?", strColNm));
+                                valueList.add(ObjValue);
+                            }
+                        }
+
+
+                    }
+
+                }
+            }
+
+            strbufQuery.append(strbufWhere);
+            if ("normal".equalsIgnoreCase(this.m_strStatementType))
+            {
+                nResulRow =   delete(strbufQuery.toString());
+            }
+            else
+            {
+                nResulRow =   update(strbufQuery.toString(), valueList);
+            }
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        return nResulRow;
+    }
+
+
+
+
 
 
     public Connection getConnection()

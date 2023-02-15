@@ -1,5 +1,5 @@
 <%@ page import="java.util.List" %>
-<%@ page import="cafe.model.CafeDTO" %>
+<%@ page import="cafe.model.Cafe" %>
 <%--
   Created by IntelliJ IDEA.
   User: jeong-wonjin
@@ -9,7 +9,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    List<CafeDTO> cafeDTOList   =   (List<CafeDTO>) request.getAttribute("cafeList");
+    List<Cafe> cafeDTOList   =   (List<Cafe>) request.getAttribute("cafeList");
     String strTitle =   "고객대기화면";
 %>
 <html>
@@ -27,7 +27,7 @@
         </thead>
         <tbody>
 
-                <% for (CafeDTO cafeDTO:cafeDTOList) { %>
+                <% for (Cafe cafeDTO:cafeDTOList) { %>
                 <tr>
                     <td><%=cafeDTO.getCustomer() %></td>
                     <td><%=cafeDTO.getDrink() %></td>

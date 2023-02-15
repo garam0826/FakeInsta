@@ -1,7 +1,7 @@
 package cafe.ctrl;
 
 import cafe.dao.CafeDAO;
-import cafe.model.CafeDTO;
+import cafe.model.Cafe;
 import db.util.DBUtil;
 
 import javax.servlet.*;
@@ -36,16 +36,16 @@ public class CafeCtrl extends HttpServlet {
     //
     private void runS01(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
-        DBUtil<CafeDTO> dbUtil  =   null;
+        DBUtil<Cafe> dbUtil  =   null;
 
         try
         {
             String strCoffee    = request.getParameter("drink");
             dbUtil = new DBUtil<>();
 
-            CafeDTO dtd =   new CafeDTO();
+            Cafe dtd =   new Cafe();
             dtd.setDrink(strCoffee);
-            List<CafeDTO> cafeDTOList = dbUtil.select(dtd);
+            List<Cafe> cafeDTOList = dbUtil.select(dtd);
 
             /*
             CafeDAO cafeDAO =   new CafeDAO();
@@ -74,7 +74,7 @@ public class CafeCtrl extends HttpServlet {
 
     private void runS02(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
-        DBUtil<CafeDTO> dbUtil  =   null;
+        DBUtil<Cafe> dbUtil  =   null;
         boolean bIsSuccess = true;
         try
         {

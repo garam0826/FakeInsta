@@ -1,6 +1,6 @@
 package cafe.model;
 
-public class CafeDTO {
+public class Cafe {
 
     private String customer;
     private String drink;

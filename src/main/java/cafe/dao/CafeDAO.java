@@ -1,6 +1,6 @@
 package cafe.dao;
 
-import cafe.model.CafeDTO;
+import cafe.model.Cafe;
 import db.util.DBUtil;
 
 import java.sql.SQLException;
@@ -19,14 +19,14 @@ public class CafeDAO
         return dbUtil.update(updateQuery);
     }
 
-    public List<CafeDTO> read(DBUtil dbUtil, String strWhere)
+    public List<Cafe> read(DBUtil dbUtil, String strWhere)
     {
         String strQuery =   "select * from cafe ";
         if(strWhere != null && !"".equals(strWhere))
         {
             strQuery += strWhere;
         }
-        return dbUtil.select(strQuery, CafeDTO.class);
+        return dbUtil.select(strQuery, Cafe.class);
     }
 
     public  int delete(DBUtil dbUtil)
