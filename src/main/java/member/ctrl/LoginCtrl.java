@@ -31,7 +31,7 @@ public class LoginCtrl extends HttpServlet{
                 session.setAttribute("UserId",id);
 
                 request.setAttribute("UserId", id);
-                RequestDispatcher requestDispatcher = request.getRequestDispatcher("login_welcome.jsp");
+                RequestDispatcher requestDispatcher = request.getRequestDispatcher("login_success.jsp");
                 requestDispatcher.forward(request, response);
             }
             else{
