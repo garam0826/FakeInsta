@@ -1,5 +1,6 @@
 package cafe.ctrl;
 
+import cafe.dao.CafeDAO;
 import cafe.model.Cafe;
 import db.util.DBUtil;
 
@@ -83,9 +84,9 @@ public class CafeCtrl extends HttpServlet {
             if (strCoffee != null)
             {
                 dbUtil = new DBUtil<>();
+                CafeDAO dao =   new CafeDAO();
 
-                String strQuery =  String.format("SELECT * FROM CAFE WHERE DRINK = '%s'", strCoffee);
-                list      = dbUtil.select(strQuery, Cafe.class);
+                list      = dao.selectbyDrink(dbUtil, strCoffee);
             }
         }
         catch (Exception ex)

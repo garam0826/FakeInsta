@@ -10,8 +10,8 @@
       let typeForm	=	document.getElementById("sign");
 
 
-      typeForm.method="post";
-      typeForm.action="./sign_check.jsp";
+     // typeForm.method="post";
+      //typeForm.action="./sign_check.jsp";
       //typeForm.target = self;
       typeForm.submit();
     }
@@ -22,7 +22,7 @@
 <body>
   <h3> 회원가입</h3>
 
-<form id="sign">
+<form id="sign" method="post" action="./sign_check.jsp" target="_self">
   아이디 : <input type="text" name="id"><br>
   비밀번호 : <input type="password" name="pw"><br>
   비밀번호확인 : <input type="password" name="pwCheck"><br>
@@ -36,9 +36,10 @@
   이메일: <input type = "text" name="email"><br>
   주소: <input type="text" name="address"><br>
   상세주소:<input type="text" name="addressDetail"><br>
-  <input type="submit" value="회원가입하기"><br>
+  <input type="submit" value="회원가입하기"/>
 
 </form>
 
+  <button onclick="post()">회원가입하기</button>
 </body>
 </html>

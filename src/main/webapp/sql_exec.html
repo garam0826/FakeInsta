@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SQL_EXEC</title>
+
+    <script>
+      function exec_query()
+      {
+            if(confirm("쿼리를수행하시겠습니까?"))
+            {
+                let formObj = document.getElementById("sql");
+                formObj.method = "post";
+                formObj.target = "_self";
+                formObj.action = "./exec_sql.html";
+                formObj.submit();
+            }
+
+      }
+
+
+
+    </script>
+</head>
+<body>
+  <form id="sql" name="sql">
+    <textarea id="query_txt" name="query_txt" width="500px" height="500px">
+    </textarea>
+  </form>
+  <input onclick="exec_query()" type="button" value="쿼리 실행"/>
+</body>
+</html>

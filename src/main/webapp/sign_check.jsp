@@ -2,12 +2,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   String UserId = request.getParameter("id");
+  String UserName = request.getParameter("name");
 
-  session.setAttribute("id",UserId);
+  //session.setAttribute("id",UserId);
 
   //session.getAttribute("id");
   MemberDTO dto = new MemberDTO();
   dto.setId(UserId);
+  dto.setName(UserName);
 
 
 %>

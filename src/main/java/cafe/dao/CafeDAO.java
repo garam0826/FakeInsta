@@ -14,6 +14,12 @@ public class CafeDAO
         return 0;
     }
 
+    public List<Cafe> selectbyDrink(DBUtil<Cafe> dbUtil, String strDirink)
+    {
+        String strQuery =  String.format("SELECT * FROM CAFE WHERE DRINK = '%s'", strDirink);
+        return dbUtil.select(strQuery, Cafe.class);
+    }
+
     public int updateNamewhereDrink(DBUtil dbUtil, String drink, String customer) throws SQLException {
         String updateQuery  = "UPDATE cafe SET customer  = '"+customer+"' WHERE drink = '"+drink+"' ";
         return dbUtil.update(updateQuery);

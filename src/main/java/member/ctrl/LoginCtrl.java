@@ -14,7 +14,7 @@ import java.util.List;
 @WebServlet(name="loginCtrl", value="/loginctrl")
 public class LoginCtrl extends HttpServlet{
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
         DBUtil<MemberDTO> dbUtil= null;
 
         PrintWriter out= response.getWriter();
@@ -35,7 +35,7 @@ public class LoginCtrl extends HttpServlet{
                 requestDispatcher.forward(request, response);
             }
             else{
-                response.sendRedirect("login_fail.jsp");
+                response.sendRedirect("login_fail.jsp?a=1&b=2");
             }
 
         }catch(Exception ex){
