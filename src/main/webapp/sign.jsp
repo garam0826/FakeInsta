@@ -30,6 +30,7 @@
   성별 <input type = "radio" name="gender" value="men">남자
   <input type = "radio" name="gender" value="women">여자<br>
 
+
   생년월일 : <input type="text" name="birth"><br>
   휴대전화:<input type = "text" name = "phone"><br>
   이메일: <input type = "text" name="email"><br>

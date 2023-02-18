@@ -4,6 +4,8 @@
   String UserId = request.getParameter("id");
 
   session.setAttribute("id",UserId);
+
+  //session.getAttribute("id");
   MemberDTO dto = new MemberDTO();
   dto.setId(UserId);
 
