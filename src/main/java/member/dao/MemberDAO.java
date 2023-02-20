@@ -18,7 +18,7 @@ public class MemberDAO {
     }
 
     public boolean selectIsMember(DBUtil dbUtil, String id, String pw){
-        List<MemberDTO> list = dbUtil.select("SELECT * FROM member WHERE id= "+id);
+        List<MemberDTO> list = dbUtil.select("SELECT * FROM member WHERE id= '"+id+"'");
         if(list != null){
             if(list.size()==1){
                 String dbPw = list.get(0).getPw();

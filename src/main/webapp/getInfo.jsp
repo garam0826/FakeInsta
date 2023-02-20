@@ -1,16 +1,20 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 82105
-  Date: 2023-02-20
-  Time: 오후 3:06
-  To change this template use File | Settings | File Templates.
---%>
+//select
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>회원정보조회</title>
 </head>
 <body>
+<%
+
+    List<Cafe> cafeList = (List<Cafe>) request.getAttribute("data");
+    for (Cafe data : cafeList)
+    {
+        out.print(data.getCustomer() + "  ");
+        out.print(data.getDrink() + "  ");
+        out.print(data.getWaitingNumber() + "<br/>");
+    }
+%>
 
 </body>
 </html>
