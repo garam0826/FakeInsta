@@ -13,8 +13,17 @@ import java.util.List;
 
 @WebServlet(name="loginCtrl", value="/loginctrl")
 public class LoginCtrl extends HttpServlet{
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
+
+        request.setCharacterEncoding("utf-8");
+        response.setCharacterEncoding("utf-8");
+
         DBUtil<MemberDTO> dbUtil= null;
 
         PrintWriter out= response.getWriter();
@@ -35,7 +44,7 @@ public class LoginCtrl extends HttpServlet{
                 requestDispatcher.forward(request, response);
             }
             else{
-                response.sendRedirect("login_fail.jsp?a=1&b=2");
+                response.sendRedirect("login_fail.jsp");
             }
 
         }catch(Exception ex){

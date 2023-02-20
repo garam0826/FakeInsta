@@ -14,7 +14,15 @@ import java.util.List;
 @WebServlet(name="signctrl", value="/signctrl")
 public class SignCtrl extends HttpServlet{
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
+        request.setCharacterEncoding("utf-8");
+        response.setCharacterEncoding("utf-8");
+
         DBUtil<MemberDTO> dbUtil=null;
 
         PrintWriter out=response.getWriter();
@@ -35,13 +43,28 @@ public class SignCtrl extends HttpServlet{
 
             HttpSession session = request.getSession();
 
-            if(true){
+            if(dao.pwCheckIsOk(dbUtil, pw, pwCheck)){
+
+                MemberDTO dto = new MemberDTO();
+                dto.setId(id);
+                dto.setPw(pw);
+                dto.setPwCheck(pwCheck);
+                dto.setName(name);
+                dto.setGender(gender);
+                dto.setBirth(birth);
+                dto.setPhone(phone);
+                dto.setEmail(email);
+                dto.setAddress(address);
+                dto.setAddressDetail(addressDetail);
+
+                //insert 하기
+
                 session.setAttribute("UserId",id);
                 session.setAttribute("UserName",name);
 
 
                 request.setAttribute("UserId", id);
-                RequestDispatcher requestDispatcher = request.getRequestDispatcher("sign.jsp");
+                RequestDispatcher requestDispatcher = request.getRequestDispatcher("sign_success.jsp");
                 requestDispatcher.forward(request, response);
 
             }

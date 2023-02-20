@@ -22,7 +22,7 @@
 <body>
   <h3> 회원가입</h3>
 
-<form id="sign" method="post" action="./sign_check.jsp" target="_self">
+<form id="sign" method="post" action="./signctrl" target="_self">
   아이디 : <input type="text" name="id"><br>
   비밀번호 : <input type="password" name="pw"><br>
   비밀번호확인 : <input type="password" name="pwCheck"><br>
@@ -40,6 +40,5 @@
 
 </form>
 
-  <button onclick="post()">회원가입하기</button>
 </body>
 </html>

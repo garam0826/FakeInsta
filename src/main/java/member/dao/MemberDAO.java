@@ -18,7 +18,7 @@ public class MemberDAO {
     }
 
     public boolean selectIsMember(DBUtil dbUtil, String id, String pw){
-        List<MemberDTO> list = dbUtil.select("select * from member where id="+id);
+        List<MemberDTO> list = dbUtil.select("select * from sign where id="+id);
         if(list != null){
             if(list.size()==1){
                 String dbPw = list.get(0).getPw();
@@ -33,6 +33,13 @@ public class MemberDAO {
 
 
     public int delete(DBUtil dbUtil){return 0;}
+
+    public boolean pwCheckIsOk(DBUtil dbUtil, String pw, String pwCheck){
+        if(pw==pwCheck){
+            return true;
+        }
+        return false;
+    }
 
 
 }
