@@ -3,6 +3,7 @@ package member.dao;
 import db.util.DBUtil;
 import member.model.MemberDTO;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class MemberDAO {
@@ -21,7 +22,7 @@ public class MemberDAO {
         List<MemberDTO> list = dbUtil.select("SELECT * FROM member WHERE id= '"+id+"'");
         if(list != null){
             if(list.size()==1){
-                String dbPw = list.get(0).getPw();
+                String dbPw = (String)(list.get(0).getPw());
                 if(pw.equals(dbPw)){
                     return true;
                 }
