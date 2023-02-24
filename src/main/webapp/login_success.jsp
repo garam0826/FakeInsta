@@ -16,7 +16,6 @@
 
 <%=UserId %>님 안녕하세요
 
-//그냥 일단
 <a href="logout.jsp">로그아웃</a><br/>
 <a href="getInfo.jsp">정보수정</a><br/>
 <a href="delete_ok.jsp">회원탈퇴</a><br/>
