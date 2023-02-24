@@ -9,6 +9,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name="signctrl", value="/signctrl")
@@ -43,7 +44,21 @@ public class SignCtrl extends HttpServlet{
 
             HttpSession session = request.getSession();
 
-            if(dao.pwCheckIsOk(dbUtil, pw, pwCheck)){
+            String strQuery= "INSERT INTO member (id,pw,pwCheck,name, gender, birth " +
+                    ",phone, email,address,addressDetail) VALUES('"
+                    +request.getParameter("id")+"'"
+                    +request.getParameter("pw")+"'"
+                    +request.getParameter("pwCheck")+"'"
+                    +request.getParameter("name")+"'"
+                    +request.getParameter("gender")+"'"
+                    +request.getParameter("birth")+"'"
+                    +request.getParameter("phone")+"'"
+                    +request.getParameter("email")+"'"
+                    +request.getParameter("address")+"'"
+                    +request.getParameter("addressDetail")+"'";
+
+            if(dao.pwCheckIsOk(dbUtil, pw, pwCheck)&& dao.signNotNull(dbUtil, id, pw,
+                    name,gender,birth,phone)){
 
                 MemberDTO dto = new MemberDTO();
                 dto.setId(id);
@@ -67,6 +82,8 @@ public class SignCtrl extends HttpServlet{
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher("sign_success.jsp");
                 requestDispatcher.forward(request, response);
 
+                insert(strQuery,request,response);
+
             }
             else{
                 response.sendRedirect("sign_fail.jsp");
@@ -78,6 +95,24 @@ public class SignCtrl extends HttpServlet{
             ex.printStackTrace();
         }finally{
             if(dbUtil!=null){
+                dbUtil.Close();
+            }
+        }
+
+    }
+
+    private void insert(String strQuery, HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
+        DBUtil<MemberDTO> dbUtil = null;
+
+        try{
+            dbUtil = new DBUtil<>();
+
+        }
+        catch(Exception ex){
+           response.sendRedirect("sign_fail.jsp");
+        }
+        finally {
+            if(dbUtil !=null){
                 dbUtil.Close();
             }
         }

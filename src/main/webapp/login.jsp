@@ -11,7 +11,7 @@
 
 
       typeForm.method="post";
-      typeForm.action="./LoginCtrl2";
+      typeForm.action="./loginctrl";
       //typeForm.target = self;
       typeForm.submit();
     }
