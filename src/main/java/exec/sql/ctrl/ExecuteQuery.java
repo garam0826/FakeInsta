@@ -34,7 +34,8 @@ public class ExecuteQuery extends HttpServlet {
         if (strQuery != null)
         {
             strQuery    = strQuery.trim(); //좌우 공백제거
-            strQuery    = strQuery.replaceAll("\n", " ").replaceAll("\r", " ");
+            strQuery    = strQuery.replaceAll("(\r\n|\r|\n|\n\r|\t)", " ");
+            //strQuery    = strQuery.replaceAll("", " ").replaceAll("\r", " ");
             System.out.println(strQuery);
 
             String strCompare = strQuery.toLowerCase();
