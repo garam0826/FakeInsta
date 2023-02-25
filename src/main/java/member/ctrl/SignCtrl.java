@@ -28,6 +28,7 @@ public class SignCtrl extends HttpServlet{
 
         PrintWriter out=response.getWriter();
         try{
+
             dbUtil= new DBUtil<MemberDTO>();
             MemberDAO dao = new MemberDAO();
 
@@ -47,15 +48,15 @@ public class SignCtrl extends HttpServlet{
             String strQuery= "INSERT INTO member (id,pw,pwCheck,name, gender, birth " +
                     ",phone, email,address,addressDetail) VALUES('"
                     +request.getParameter("id")+"'"
-                    +request.getParameter("pw")+"'"
-                    +request.getParameter("pwCheck")+"'"
-                    +request.getParameter("name")+"'"
-                    +request.getParameter("gender")+"'"
-                    +request.getParameter("birth")+"'"
-                    +request.getParameter("phone")+"'"
-                    +request.getParameter("email")+"'"
-                    +request.getParameter("address")+"'"
-                    +request.getParameter("addressDetail")+"'";
+                    +",'"+request.getParameter("pw")+"'"
+                    +",'"+request.getParameter("pwCheck")+"'"
+                    +",'"+request.getParameter("name")+"'"
+                    +",'"+request.getParameter("gender")+"'"
+                    +",'"+request.getParameter("birth")+"'"
+                    +",'"+request.getParameter("phone")+"'"
+                    +",'"+request.getParameter("email")+"'"
+                    +",'"+request.getParameter("address")+"'"
+                    +",'"+request.getParameter("addressDetail")+"')";
 
             if(dao.pwCheckIsOk(dbUtil, pw, pwCheck)&& dao.signNotNull(dbUtil, id, pw,
                     name,gender,birth,phone)){
@@ -72,7 +73,8 @@ public class SignCtrl extends HttpServlet{
                 dto.setAddress(address);
                 dto.setAddressDetail(addressDetail);
 
-                //insert 하기
+
+
 
                 session.setAttribute("UserId",id);
                 session.setAttribute("UserName",name);
@@ -82,7 +84,10 @@ public class SignCtrl extends HttpServlet{
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher("sign_success.jsp");
                 requestDispatcher.forward(request, response);
 
+                //insert 하기
                 insert(strQuery,request,response);
+
+
 
             }
             else{

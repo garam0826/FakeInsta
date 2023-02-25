@@ -5,6 +5,7 @@ import member.model.MemberDTO;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MemberDAO {
     public int create(DBUtil dbUtil, String id,String pw, String pwCheck
@@ -19,10 +20,11 @@ public class MemberDAO {
     }
 
     public boolean selectIsMember(DBUtil dbUtil, String id, String pw){
-        List<MemberDTO> list = dbUtil.select("SELECT * FROM member WHERE id= '"+id+"'", MemberDAO.class);
+        //List<MemberDTO> list = dbUtil.select("SELECT * FROM member WHERE id= '"+id+"'", MemberDTO.class);
+        List<Map<String, Object>> list    =   dbUtil.select("SELECT * FROM member WHERE id= '"+id+"'");
         if(list != null){
             if(list.size()==1){
-                String dbPw = list.get(0).getPw();
+                String dbPw = (String) list.get(0).get("pw");
                 if(pw.equals(dbPw)){
                     return true;
                 }
@@ -48,6 +50,9 @@ public class MemberDAO {
             return true;
         }
         return false;
+    }
+    public boolean firstSign(DBUtil dbUtil, String id){
+        return true;
     }
 
 

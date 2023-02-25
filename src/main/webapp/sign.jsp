@@ -3,7 +3,9 @@
 <head>
   <style>
   </style>
-
+<%
+  String a  = "11";
+%>
   <script type="text/javascript">
     function post()
     {
@@ -23,7 +25,7 @@
   <h3> 회원가입</h3>
 
 <form id="sign" method="post" action="./signctrl" target="_self">
-  아이디 : <input type="text" name="id"><br>
+  아이디 : <input type="text" name="id" value="<%=a%>"><br>
   비밀번호 : <input type="password" name="pw"><br>
   비밀번호확인 : <input type="password" name="pwCheck"><br>
   이름 : <input type ="text" name="name"><br>

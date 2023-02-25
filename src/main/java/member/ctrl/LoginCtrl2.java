@@ -53,4 +53,5 @@ public class LoginCtrl2 extends HttpServlet {
         RequestDispatcher rq= request.getRequestDispatcher("login_success.jsp");
         rq.forward(request,response);
     }
+
 }
