@@ -38,6 +38,7 @@ public class LoginCtrl extends HttpServlet{
 
             if(dao.selectIsMember(dbUtil,id, pw)){
                 session.setAttribute("UserId",id);
+                session.setAttribute("UserPw",pw);
 
                 request.setAttribute("UserId", id);
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher("login_success.jsp");

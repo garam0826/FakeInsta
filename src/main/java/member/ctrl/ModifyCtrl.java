@@ -9,18 +9,16 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
-@WebServlet(name="signctrl", value="/signctrl")
-public class SignCtrl extends HttpServlet{
+@WebServlet(name = "ModifyCtrl", value = "/ModifyCtrl")
+public class ModifyCtrl extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doPost(request, response);
+        doPost(request,response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
 
@@ -45,18 +43,17 @@ public class SignCtrl extends HttpServlet{
 
             HttpSession session = request.getSession();
 
-            String strQuery= "INSERT INTO member (id,pw,pwCheck,name, gender, birth " +
-                    ",phone, email,address,addressDetail) VALUES('"
-                    +request.getParameter("id")+"'"
-                    +",'"+request.getParameter("pw")+"'"
-                    +",'"+request.getParameter("pwCheck")+"'"
-                    +",'"+request.getParameter("name")+"'"
-                    +",'"+request.getParameter("gender")+"'"
-                    +",'"+request.getParameter("birth")+"'"
-                    +",'"+request.getParameter("phone")+"'"
-                    +",'"+request.getParameter("email")+"'"
-                    +",'"+request.getParameter("address")+"'"
-                    +",'"+request.getParameter("addressDetail")+"')";
+            //update로 쿼리문 수정하기
+            String strQuery= "UPDATE member set pw ='"+ pw +"'," +
+                    "pwCheck =' "+ pwCheck +"',"+
+                    "name ='"+ name +" ',"+
+                    "gender ='"+ gender +" ', "+
+                    "birth =' "+ birth +"', "+
+                    "phone =' "+ phone +"', "+
+                    "email =' "+ email +"', "+
+                    "address ='"+ address +" ', "+
+                    "addressDetail =' "+ addressDetail +"' WHERE id='"+ id +"'";
+
 
             if(dao.pwCheckIsOk(dbUtil, pw, pwCheck)&& dao.signNotNull(dbUtil, id, pw,
                     name,gender,birth,phone)){
@@ -73,21 +70,18 @@ public class SignCtrl extends HttpServlet{
                 dto.setAddress(address);
                 dto.setAddressDetail(addressDetail);
 
-                session.setAttribute("UserId",id);
-                session.setAttribute("UserName",name);
-
                 request.setAttribute("UserId", id);
-                RequestDispatcher requestDispatcher = request.getRequestDispatcher("sign_success.jsp");
+                RequestDispatcher requestDispatcher = request.getRequestDispatcher("modify_success.jsp");
                 requestDispatcher.forward(request, response);
 
-                //insert 하기
-                insert(strQuery,request,response);
+                //update 하기
+                update(strQuery,request,response);
 
 
 
             }
             else{
-                response.sendRedirect("sign_fail.jsp");
+                response.sendRedirect("modify_fail.jsp");
 
             }
 
@@ -102,7 +96,7 @@ public class SignCtrl extends HttpServlet{
 
     }
 
-    private void insert(String strQuery, HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
+    private void update(String strQuery, HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
         DBUtil<MemberDTO> dbUtil = null;
 
         try{
@@ -110,7 +104,7 @@ public class SignCtrl extends HttpServlet{
 
         }
         catch(Exception ex){
-           response.sendRedirect("sign_fail.jsp");
+            response.sendRedirect("modify_fail.jsp");
         }
         finally {
             if(dbUtil !=null){

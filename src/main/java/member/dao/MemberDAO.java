@@ -34,6 +34,22 @@ public class MemberDAO {
         return false;
     }
 
+    public void selectData(DBUtil dbUtil, String id){
+        List<Map<String, Object>> list    =   dbUtil.select("SELECT * FROM member WHERE id= '"+id+"'");
+        if(list !=null){
+            String dbPw = (String) list.get(0).get("pw");
+            String dbPwCheck = (String) list.get(0).get("pw");
+            String dbName = (String) list.get(0).get("name");
+            String dbGender = (String) list.get(0).get("gender");
+            String dbBrith = (String) list.get(0).get("birth");
+            String dbPhone = (String) list.get(0).get("phone");
+            String dbEmail = (String) list.get(0).get("email");
+            String dbAddress = (String) list.get(0).get("address");
+            String dbAddressDetail = (String) list.get(0).get("addressDetail");
+        }
+
+    }
+
 
     public int delete(DBUtil dbUtil){return 0;}
 
