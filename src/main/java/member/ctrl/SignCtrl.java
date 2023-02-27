@@ -9,6 +9,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +83,7 @@ public class SignCtrl extends HttpServlet{
 
                 //insert 하기
                 insert(strQuery,request,response);
+                dbUtil.Commit();
 
 
 
@@ -96,6 +98,11 @@ public class SignCtrl extends HttpServlet{
             ex.printStackTrace();
         }finally{
             if(dbUtil!=null){
+                try {
+                    dbUtil.Commit();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 dbUtil.Close();
             }
         }
