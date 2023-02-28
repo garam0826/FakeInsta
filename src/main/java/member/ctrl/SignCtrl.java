@@ -82,6 +82,14 @@ public class SignCtrl extends HttpServlet{
                 requestDispatcher.forward(request, response);
 
                 //insert 하기
+                /*
+                insert함수안에 dbutil생성만하고 insert로직이 없음...
+                쿼리만 만들고 insert를 안하니 테이블에 안쌓이겠죠?
+                insert함수를 만들었으면 거기에서 insert를 해야죠
+                아니면 지금 이 함수 안에 dbutil 생성자 선언해놨으니
+                insert함수없이 여기에서 insert하든가요
+
+                */
                 insert(strQuery,request,response);
                 dbUtil.Commit();
 
