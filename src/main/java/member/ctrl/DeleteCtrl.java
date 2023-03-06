@@ -55,6 +55,8 @@ public class DeleteCtrl extends HttpServlet {
 
         try{
             dbUtil = new DBUtil<>();
+            //delete 로직
+
 
         }
         catch(Exception ex){
