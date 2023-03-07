@@ -45,14 +45,14 @@ public class ModifyCtrl extends HttpServlet {
 
             //update로 쿼리문 수정하기
             String strQuery= "UPDATE member set pw ='"+ pw +"'," +
-                    "pwCheck =' "+ pwCheck +"',"+
-                    "name ='"+ name +" ',"+
-                    "gender ='"+ gender +" ', "+
-                    "birth =' "+ birth +"', "+
-                    "phone =' "+ phone +"', "+
-                    "email =' "+ email +"', "+
-                    "address ='"+ address +" ', "+
-                    "addressDetail =' "+ addressDetail +"' WHERE id='"+ id +"'";
+                    "pwCheck =' "+ pwCheck.trim() +"',"+
+                    "name ='"+ name.trim() +" ',"+
+                    "gender ='"+ gender.trim() +" ', "+
+                    "birth ='"+ birth.trim() +"', "+
+                    "phone ='"+ phone.trim() +"', "+
+                    "email ='"+ email.trim() +"', "+
+                    "address ='"+ address.trim() +" ', "+
+                    "addressDetail ='"+ addressDetail.trim() +"' WHERE id='"+ id +"'";
 
 
             if(dao.pwCheckIsOk(dbUtil, pw, pwCheck)&& dao.signNotNull(dbUtil, id, pw,
@@ -75,7 +75,8 @@ public class ModifyCtrl extends HttpServlet {
                 requestDispatcher.forward(request, response);
 
                 //update 하기
-                update(strQuery,request,response);
+                dbUtil.update(strQuery);
+
 
 
 

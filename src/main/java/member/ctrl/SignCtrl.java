@@ -90,7 +90,8 @@ public class SignCtrl extends HttpServlet{
                 insert함수없이 여기에서 insert하든가요
 
                 */
-                insert(strQuery,request,response);
+                dbUtil.insert(strQuery);
+               // insert(strQuery,request,response);
                 dbUtil.Commit();
 
 

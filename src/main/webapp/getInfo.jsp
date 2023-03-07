@@ -1,22 +1,26 @@
 <%@ page import="member.model.MemberDTO" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <style>
     </style>
     <%
+
+        List<Map<String, Object>> listUser = (List<Map<String, Object>>) request.getAttribute("userInfo");
+
         //로그인한 상태에서만 회원정보수정이 가능
-        String a = (String) session.getAttribute("UserId");
-        String b = "1234";
-        String c = "1234";
-        String d = "temp";
-        String e = "women";
-        String f = "temp";
-        String g = "1234";
-        String h = "temp";
-        String i = "temp";
-        String j = "temp";
+        String strUser = (String) session.getAttribute("UserId");
+
+        Map<String, Object> userInfo    =   listUser.get(0);
+        String strName = (String) userInfo.get("name");
+        String strSex =  (String) userInfo.get("gender");
+        String strBirth =  (String) userInfo.get("birth");
+        String strPhone =  (String) userInfo.get("phone");
+        String strEmail =  (String) userInfo.get("email");
+        String strAddress = (String) userInfo.get("address");
+        String strAddr_Detail = (String) userInfo.get("addressDetail");
 
 
 
@@ -47,12 +51,12 @@
 <h3> 회원정보수정</h3>
 
 <form id="modify" method="post" action="./ModifyCtrl" target="_self">
-    아이디 : <input type="text" name="id" value="<%=a%>"><br>
-    비밀번호 : <input type="password" name="pw" value="<%=b%>" ><br>
-    비밀번호확인 : <input type="password" name="pwCheck" value="<%=c%>"><br>
-    이름 : <input type ="text" name="name" value="<%=d%>"><br>
+    아이디 : <input type="text" name="id" value="<%=strUser%>"><br>
+    비밀번호 : <input type="password" name="pw" /> ><br>
+    비밀번호확인 : <input type="password" name="pwCheck"/> <br>
+    이름 : <input type ="text" name="name" value="<%=strName%>"><br>
 
-    <% if(e.equals("men")){ %>
+    <% if(strSex.equals("men")){ %>
         성별 <input type = "radio" name="gender" value="men" checked> 남자
         <input type = "radio" name="gender" value="women">여자<br>
     <%}else{%>
@@ -62,11 +66,11 @@
 
 
 
-    생년월일 : <input type="text" name="birth" value="<%=f%>"><br>
-    휴대전화: <input type ="text" name = "phone" value="<%=g%>"><br>
-    이메일: <input type = "text" name="email" value="<%=h%>"><br>
-    주소: <input type="text" name="address" value="<%=i%>"><br>
-    상세주소:<input type="text" name="addressDetail" value="<%=j%>"><br>
+    생년월일 : <input type="text" name="birth" value="<%=strBirth%>"><br>
+    휴대전화: <input type ="text" name = "phone" value="<%=strPhone%>"><br>
+    이메일: <input type = "text" name="email" value="<%=strEmail%>"><br>
+    주소: <input type="text" name="address" value="<%=strAddress%>"><br>
+    상세주소:<input type="text" name="addressDetail" value="<%=strAddr_Detail%>"><br>
     <input type="submit" value="회원정보수정하기"/>
 
 </form>

@@ -76,7 +76,11 @@ public class DBUtil <T>
 
     }
 
-    private int update( String strQuery, List<Object> valueList) throws SQLException
+    public Connection getConn() {
+        return conn;
+    }
+
+    private int update(String strQuery, List<Object> valueList) throws SQLException
     {
         int nResult	=	-1;
         conn.setAutoCommit(false);
