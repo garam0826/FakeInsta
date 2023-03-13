@@ -46,7 +46,7 @@ public class ModifyLoadCtrl extends HttpServlet{
             //로그인한 상태에서만 회원정보수정이 가능
             String strUserId = (String) session.getAttribute("UserId");
 
-            /* 학교용
+            /* 학교
             String strQuery =   "select * from member where id = ? and name = ?";
            // String strQuery =   "update member set pw=? where id=?";
 

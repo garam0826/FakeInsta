@@ -28,7 +28,6 @@ public class LoginCtrl2 extends HttpServlet {
         String UserPw=request.getParameter("pw");
 
         if(request.getParameter("id")!= null){
-            //얜 함수임
             select(strQuery,request,response);
         }
     }
